@@ -1,10 +1,9 @@
 graphhopper:
 
   # OpenStreetMap input file PBF or XML, can be changed via command line -Ddw.graphhopper.datareader.file=some.pbf
-  datareader.file: ""
+  datareader.file: "sachsen-latest.osm.pbf"
   # Local folder used by graphhopper to store its data
   graph.location: graph-cache
-
 
   ##### Routing Profiles ####
 
@@ -35,17 +34,21 @@ graphhopper:
 #       u_turn_costs: 60
      custom_model_files: [car.json]
 
-#    - name: foot
-#      custom_model_files: [foot.json, foot_elevation.json]
+   - name: foot
+     custom_model_files: [foot.json, foot_elevation.json]
 #
-#    - name: bike
-#      custom_model_files: [bike.json, bike_elevation.json]
+   - name: bike
+     custom_model_files: [bike.json, bike_elevation.json]
 #
-#    - name: racingbike
-#      custom_model_files: [racingbike.json, bike_elevation.json]
+   - name: racingbike
+     custom_model_files: [racingbike.json, bike_elevation.json]
 #
-#    - name: mtb
-#      custom_model_files: [mtb.json, bike_elevation.json]
+   - name: mtb
+     custom_model_files: [mtb.json, bike_elevation.json]
+
+   - name: bus
+     custom_model_files: [bus.json]
+
 
   # instead of the inbuilt custom models (see ./core/src/main/resources/com/graphhopper/custom_models)
   # you can specify a folder where to find your own custom model files
@@ -57,8 +60,8 @@ graphhopper:
   # list you can define for which of the above routing profiles such preparation shall be performed. Note that to support
   # profiles with `turn_costs: true` a more elaborate preparation is required (longer preparation time and more memory
   # usage) and the routing will also be slower than with `turn_costs: false`.
-  profiles_ch:
-    - profile: car
+  profiles_ch: []
+
 
   # Hybrid mode:
   # Similar to speed mode, the hybrid mode (Landmarks, LM) also speeds up routing by doing calculating auxiliary data
@@ -69,7 +72,7 @@ graphhopper:
   # profile for which an LM profile exists. Important: This only will give correct routing results if the weights
   # calculated for the profile are equal or larger (for every edge) than those calculated for the profile that was used
   # for the preparation (`my_other_profile`)
-  profiles_lm: []
+  profiles_lm: [car, foot, bike, mtb, racingbike,bus]
 
 
   #### Encoded Values ####
@@ -85,10 +88,10 @@ graphhopper:
 
   # To make CH preparation faster for multiple profiles you can increase the default threads if you have enough RAM.
   # Change this setting only if you know what you are doing and if the default worked for you.
-  # prepare.ch.threads: 1
+  prepare.ch.threads: 16
 
   # To tune the performance vs. memory usage for the hybrid mode use
-  # prepare.lm.landmarks: 16
+  prepare.lm.landmarks: 16
 
   # Make landmark preparation parallel if you have enough RAM. Change this only if you know what you are doing and if
   # the default worked for you.
@@ -98,16 +101,16 @@ graphhopper:
   #### Elevation ####
 
   # To populate your graph with elevation data use SRTM, default is noop (no elevation). Read more about it in docs/core/elevation.md
-  # graph.elevation.provider: srtm
+  graph.elevation.provider: srtm
 
   # default location for cache is /tmp/srtm
-  # graph.elevation.cache_dir: ./srtmprovider/
+  graph.elevation.cache_dir: ./srtmprovider/
 
   # If you have a slow disk or plenty of RAM change the default MMAP to:
   # graph.elevation.dataaccess: RAM_STORE
 
   # To enable bilinear interpolation when sampling elevation at points (default uses nearest neighbor):
-  # graph.elevation.interpolate: bilinear
+  graph.elevation.interpolate: bilinear
 
   # Reduce ascend/descend per edge without changing the maximum slope:
   # graph.elevation.edge_smoothing: ramer
@@ -134,7 +137,7 @@ graphhopper:
   # This features sets a maximum speed in 'max_speed' encoded value if no maxspeed tag was found. It is country-dependent
   # and based on several rules. See https://github.com/westnordost/osm-legal-default-speeds
   # To use it uncomment the following, then enable urban density below and add 'country' to graph.encoded_values
-  # max_speed_calculator.enabled: true
+  max_speed_calculator.enabled: true
 
 
   #### Urban density (built-up areas) ####
@@ -145,10 +148,10 @@ graphhopper:
   # Use higher/lower sensitivities if too little/many roads fall into the according categories.
   # Using smaller radii will speed up the classification, but only change these values if you know what you are doing.
   # If you do not need the (rather slow) city classification set city_radius to zero.
-  # graph.urban_density.residential_radius: 400
-  # graph.urban_density.residential_sensitivity: 6000
-  # graph.urban_density.city_radius: 1500
-  # graph.urban_density.city_sensitivity: 1000
+  graph.urban_density.residential_radius: 400
+  graph.urban_density.residential_sensitivity: 6000
+  graph.urban_density.city_radius: 1500
+  graph.urban_density.city_sensitivity: 1000
 
 
   #### Subnetworks ####
@@ -185,8 +188,9 @@ graphhopper:
   # motorized vehicles. This leads to a smaller and less dense graph, because there are fewer ways (obviously),
   # but also because there are fewer crossings between highways (=junctions).
   # Another typical example is excluding 'motorway', 'trunk' and maybe 'primary' highways for bicycle or pedestrian routing.
-  import.osm.ignored_highways: footway,cycleway,path,pedestrian,steps # typically useful for motorized-only routing
-  # import.osm.ignored_highways: motorway,trunk # typically useful for non-motorized routing
+  # import.osm.ignored_highways: footway,cycleway,path,pedestrian,steps # typically useful for motorized-only routing
+  import.osm.ignored_highways: motorway,trunk # typically useful for non-motorized routing
+
 
   # configure the memory access, use RAM_STORE for well equipped servers (default and recommended)
   graph.dataaccess.default_type: RAM_STORE
